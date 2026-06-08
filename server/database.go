@@ -46,14 +46,22 @@ func toJSON(v []string) string {
 // --- Task CRUD ---
 
 func createTask(db *sql.DB, input TaskInput) (Task, error) {
-	if strings.TrimSpace(input.Title) == "" {
+	title := strings.TrimSpace(input.Title)
+	if title == "" {
 		return Task{}, fmt.Errorf("title is required")
+	}
+	if len(title) > 200 {
+		return Task{}, fmt.Errorf("title too long (max 200)")
+	}
+	detail := strings.TrimSpace(input.Detail)
+	if len(detail) > 5000 {
+		return Task{}, fmt.Errorf("detail too long (max 5000)")
 	}
 	ts := now()
 	t := Task{
 		ID:           genID(),
-		Title:        strings.TrimSpace(input.Title),
-		Detail:       strings.TrimSpace(input.Detail),
+		Title:        title,
+		Detail:       detail,
 		Month:        input.Month,
 		Status:       input.Status,
 		Priority:     input.Priority,
@@ -343,8 +351,14 @@ func carryOver(db *sql.DB, fromMonth, toMonth string) (int, error) {
 func bulkImport(db *sql.DB, items []TaskInput, mode string) (ImportResult, error) {
 	var r ImportResult
 
+	tx, err := db.Begin()
+	if err != nil {
+		return r, err
+	}
+	defer tx.Rollback() // no-op after Commit
+
 	if mode == "replace" {
-		if _, err := db.Exec("DELETE FROM tasks"); err != nil {
+		if _, err := tx.Exec("DELETE FROM tasks"); err != nil {
 			return r, fmt.Errorf("clearing tasks for import: %w", err)
 		}
 	}
@@ -354,12 +368,43 @@ func bulkImport(db *sql.DB, items []TaskInput, mode string) (ImportResult, error
 			r.Skipped++
 			continue
 		}
-		_, err := createTask(db, input)
+		// Use tx for consistency
+		ts := now()
+		t := Task{
+			ID:        genID(),
+			Title:     strings.TrimSpace(input.Title),
+			Detail:    strings.TrimSpace(input.Detail),
+			Month:     input.Month,
+			Status:    input.Status,
+			Priority:  input.Priority,
+			DueDate:   input.DueDate,
+			CarryFrom: input.CarryFrom,
+			SourceTaskID: input.SourceTaskID,
+			CreatedAt: ts,
+			UpdatedAt: ts,
+		}
+		if t.Status == "" {
+			t.Status = "todo"
+		}
+		if t.Priority == "" {
+			t.Priority = "medium"
+		}
+		tagsJSON := "[]"
+		if len(input.Tags) > 0 {
+			tagsJSON = toJSON(input.Tags)
+		}
+		_, err := tx.Exec(`INSERT INTO tasks (id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,created_at,updated_at)
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
+			t.ID, t.Title, t.Detail, t.Month, t.Status, t.Priority, t.DueDate, t.CarryFrom, t.SourceTaskID, tagsJSON, t.CreatedAt, t.UpdatedAt)
 		if err != nil {
 			r.Skipped++
 			continue
 		}
 		r.Imported++
+	}
+
+	if err := tx.Commit(); err != nil {
+		return r, err
 	}
 	return r, nil
 }
