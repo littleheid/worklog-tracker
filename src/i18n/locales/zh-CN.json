@@ -89,6 +89,7 @@
     "selectPriority": "选择优先级",
     "dueDate": "截止日期",
     "dueDatePlaceholder": "可选，不设置则不参与逾期判断",
+    "titleRequired": "不能为空",
     "close": "关闭弹窗"
   },
   "confirm": {

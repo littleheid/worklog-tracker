@@ -7,6 +7,7 @@ import MenuSelect from "../common/MenuSelect.vue";
 import TagInput from "../common/TagInput.vue";
 
 const form = defineModel<TaskDraft>({ required: true });
+defineProps<{ error?: boolean }>();
 const { t } = useI18n();
 </script>
 
@@ -14,9 +15,14 @@ const { t } = useI18n();
   <div class="mt-5 grid gap-4 md:grid-cols-2">
     <!-- 标题 -->
     <label class="md:col-span-2">
-      <span class="mb-1.5 block text-[13px] font-semibold text-stone-700">{{ t("form.title") }}</span>
-      <input :value="form.title" type="text" maxlength="120"
-        class="input-glass h-10 w-full rounded-xl px-3.5 text-[14px] text-stone-800 placeholder:text-stone-400"
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-[13px] font-semibold" :class="error && !form.title.trim() ? 'text-red-500' : 'text-stone-700'">
+          {{ t("form.title") }} <span class="text-red-400">*</span>
+        </span>
+      </div>
+      <input :value="form.title" type="text" maxlength="200"
+        class="h-10 w-full rounded-xl px-3.5 text-[14px] text-stone-800 placeholder:text-stone-400 transition-colors"
+        :class="error && !form.title.trim() ? 'bg-red-50/60 border border-red-300' : 'input-glass'"
         :placeholder="t('form.titlePlaceholder')"
         @input="form.title = ($event.target as HTMLInputElement).value" />
     </label>
@@ -24,7 +30,7 @@ const { t } = useI18n();
     <!-- 内容说明 -->
     <label class="md:col-span-2">
       <span class="mb-1.5 block text-[13px] font-semibold text-stone-700">{{ t("form.description") }}</span>
-      <textarea :value="form.detail" rows="4" maxlength="2000"
+      <textarea :value="form.detail" rows="4" maxlength="5000"
         class="input-glass min-h-[120px] w-full rounded-xl px-3.5 py-2.5 text-[14px] leading-6 text-stone-800 placeholder:text-stone-400"
         :placeholder="t('form.descPlaceholder')"
         @input="form.detail = ($event.target as HTMLTextAreaElement).value"></textarea>

@@ -78,7 +78,7 @@ function tagColor(tag: string): string {
     </div>
 
     <!-- 操作栏（hover 显示，始终占位） -->
-    <div class="mt-3 pt-3 border-t border-white/20 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+    <div class="mt-3 pt-3 border-t border-white/20 flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
       <MenuSelect :model-value="task.status" :options="TASK_STATUS_OPTIONS" compact align="left"
         :panel-title="t('taskCard.changeStatus')"
         @update:model-value="emit('status-change', { id: task.id, status: $event as TaskStatus })" />

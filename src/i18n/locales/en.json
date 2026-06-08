@@ -89,6 +89,7 @@
     "selectPriority": "Select priority",
     "dueDate": "Due date",
     "dueDatePlaceholder": "Optional, no date means no overdue check",
+    "titleRequired": " is required",
     "close": "Close"
   },
   "confirm": {

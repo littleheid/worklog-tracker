@@ -371,17 +371,17 @@ func bulkImport(db *sql.DB, items []TaskInput, mode string) (ImportResult, error
 		// Use tx for consistency
 		ts := now()
 		t := Task{
-			ID:        genID(),
-			Title:     strings.TrimSpace(input.Title),
-			Detail:    strings.TrimSpace(input.Detail),
-			Month:     input.Month,
-			Status:    input.Status,
-			Priority:  input.Priority,
-			DueDate:   input.DueDate,
-			CarryFrom: input.CarryFrom,
+			ID:           genID(),
+			Title:        strings.TrimSpace(input.Title),
+			Detail:       strings.TrimSpace(input.Detail),
+			Month:        input.Month,
+			Status:       input.Status,
+			Priority:     input.Priority,
+			DueDate:      input.DueDate,
+			CarryFrom:    input.CarryFrom,
 			SourceTaskID: input.SourceTaskID,
-			CreatedAt: ts,
-			UpdatedAt: ts,
+			CreatedAt:    ts,
+			UpdatedAt:    ts,
 		}
 		if t.Status == "" {
 			t.Status = "todo"
