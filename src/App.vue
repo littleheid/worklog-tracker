@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import TopNav from "./components/layout/TopNav.vue";
 import ToastStack from "./components/common/ToastStack.vue";
@@ -14,16 +14,6 @@ import type { ActivePage } from "./types/ui";
 const { t } = useI18n();
 const uiStore = useUiStore();
 const taskStore = useTaskStore();
-
-const pageOrder: ActivePage[] = ["dashboard", "tasks", "insights", "settings"];
-const previousIndex = ref(pageOrder.indexOf(uiStore.activePage));
-const transitionName = ref("page-slide-right");
-
-watch(() => uiStore.activePage, (next) => {
-  const nextIdx = pageOrder.indexOf(next);
-  transitionName.value = nextIdx > previousIndex.value ? "page-slide-right" : "page-slide-left";
-  previousIndex.value = nextIdx;
-});
 
 const pageComponentMap: Record<ActivePage, typeof DashboardPage> = {
   dashboard: DashboardPage,
@@ -62,7 +52,7 @@ onMounted(async () => {
     />
 
     <div class="relative mt-5">
-      <Transition :name="transitionName">
+      <Transition name="page-fade" mode="out-in">
         <component :is="activePageComponent" :key="uiStore.activePage" />
       </Transition>
     </div>
