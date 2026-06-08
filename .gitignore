@@ -1,0 +1,51 @@
+# AI / Agent
+.pi/
+.codex/
+.agents/
+.claude/
+*.jsonl
+*.session
+AGENTS.md
+AGENTS.override.md
+review-findings.md
+
+# 文档
+docs/
+agents-example/
+review-findings.md
+HOMEBREW.md
+
+# Dependencies
+node_modules
+
+# Build output
+dist
+server/dist
+server/worklog-tracker
+server/worklog-tracker.exe
+
+# Release artifacts
+release/
+
+# SQLite databases (data stored in ~/.worklog-tracker/)
+*.db
+*.db-journal
+*.db-wal
+
+# Runtime files
+*.pid
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local

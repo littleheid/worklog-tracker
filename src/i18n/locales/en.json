@@ -1,0 +1,192 @@
+{
+  "sidebar": {
+    "logo": "Worklog",
+    "subtitle": "Local work tracker"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "tasks": "Tasks",
+    "insights": "Insights",
+    "settings": "Settings"
+  },
+  "pageMeta": {
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "Overview of monthly status, overdue risks, and recent updates."
+    },
+    "tasks": {
+      "title": "Tasks",
+      "description": "Record, filter, and manage monthly work items and carry-overs."
+    },
+    "insights": {
+      "title": "Insights",
+      "description": "Break down task distribution by status and priority for monthly reviews."
+    }
+  },
+  "search": {
+    "placeholder": "Search title or description"
+  },
+  "taskList": {
+    "title": "Tasks",
+    "subtitle": "View, edit, and track this month's items.",
+    "emptyTitle": "No items found",
+    "emptyDesc": "Try adjusting the month, status, or priority filters."
+  },
+  "taskCard": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "noDescription": "No description.",
+    "due": "Due",
+    "from": "From",
+    "changeStatus": "Change status"
+  },
+  "stats": {
+    "total": "Total",
+    "done": "Done",
+    "open": "Open"
+  },
+  "pagination": {
+    "prev": "Prev",
+    "next": "Next",
+    "info": "{total} items · Page {page} of {totalPages}"
+  },
+  "filter": {
+    "year": "Year",
+    "month": "Month",
+    "status": "Status",
+    "priority": "Priority",
+    "sort": "Sort",
+    "selectYear": "Select year",
+    "selectMonth": "Select month",
+    "selectStatus": "Select status",
+    "selectPriority": "Select priority",
+    "sortBy": "Sort by",
+    "summary": "Summary",
+    "perPage": "Per page",
+    "itemsPerPage": "Items per page",
+    "addTask": "Add Task",
+    "more": "More",
+    "importDemo": "Import demo data",
+    "importMerge": "Import JSON (merge)",
+    "importReplace": "Import JSON (replace)",
+    "export": "Export JSON",
+    "carryOver": "Carry over last month"
+  },
+  "form": {
+    "newTask": "New Task",
+    "editTask": "Edit Task",
+    "desc": "Fill in the details and save to update the list immediately.",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "title": "Title",
+    "titlePlaceholder": "e.g. Prepare monthly review",
+    "description": "Description",
+    "descPlaceholder": "Background, deliverables, risks, or follow-up notes",
+    "status": "Status",
+    "selectStatus": "Select status",
+    "priority": "Priority",
+    "selectPriority": "Select priority",
+    "dueDate": "Due date",
+    "dueDatePlaceholder": "Optional, no date means no overdue check",
+    "close": "Close"
+  },
+  "confirm": {
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "datePicker": {
+    "noDate": "No due date",
+    "due": "Due",
+    "clear": "Clear"
+  },
+  "menu": {
+    "select": "Select",
+    "close": "Close"
+  },
+  "status": {
+    "todo": "Todo",
+    "doing": "In Progress",
+    "done": "Done",
+    "paused": "Paused"
+  },
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "dashboard": {
+    "total": "Total",
+    "done": "Done",
+    "inProgress": "In Progress",
+    "overdue": "Overdue",
+    "status": "Status",
+    "statusSubtitle": "{total} items",
+    "priority": "Priority",
+    "prioritySubtitle": "Current month",
+    "recentUpdates": "Recent Updates",
+    "recentSubtitle": "Quick access to recently modified items.",
+    "noRecent": "No recent updates this month.",
+    "noDescription": "No description."
+  },
+  "insights": {
+    "statusBreakdown": "Status Breakdown",
+    "statusDesc": "Distribution and meaning of each status in the current month.",
+    "priorityBreakdown": "Priority Breakdown",
+    "priorityDesc": "Identify high-priority items to guide the month's focus.",
+    "completionRate": "Completion Rate",
+    "completionDesc": "Percentage of done items in this month.",
+    "doneOf": "Done {done} / {total}",
+    "statusColumn": "Status",
+    "countColumn": "Count",
+    "meaningColumn": "Meaning",
+    "statusDoneDesc": "Closed items",
+    "statusDoingDesc": "Work in progress",
+    "statusTodoDesc": "Not yet started",
+    "statusPausedDesc": "On hold or pending",
+    "priorityHighDesc": "Needs priority attention",
+    "priorityMediumDesc": "Regular priority",
+    "priorityLowDesc": "Lower urgency"
+  },
+  "toast": {
+    "initFailed": "Initialization failed: {message}",
+    "unknownError": "Unknown error",
+    "taskCreated": "Task created",
+    "taskUpdated": "Task updated",
+    "taskDeleted": "Task deleted",
+    "createFailed": "Create failed: {message}",
+    "updateFailed": "Update failed: {message}",
+    "deleteFailed": "Delete failed: {message}",
+    "listRefreshFailed": "List refresh failed: {message}",
+    "initRefreshFailed": "Init refresh failed: {message}",
+    "noCarryItems": "No items to carry over",
+    "carriedOver": "Carried over {count} items",
+    "carryFailed": "Carry over failed: {message}",
+    "importDone": "Import done: {imported} succeeded, {skipped} skipped",
+    "importFailed": "Import failed: {message}",
+    "importParseFailed": "Import file parse failed",
+    "seedExists": "Demo data already exists",
+    "seedDone": "Added {count} demo items",
+    "seedFailed": "Demo data import failed: {message}",
+    "exportFailed": "Export failed: {message}",
+    "exportDone": "JSON exported",
+    "createRefreshFailed": "Refresh after create failed",
+    "updateRefreshFailed": "Refresh after update failed",
+    "deleteRefreshFailed": "Refresh after delete failed"
+  },
+  "language": "Language",
+  "settings": {
+    "title": "Settings",
+    "desc": "Adjust display preferences and behavior. Changes take effect immediately.",
+    "recentLimit": "Recent updates count",
+    "recentLimitDesc": "Maximum number of recent items shown on the Dashboard",
+    "pageSize": "Default page size",
+    "pageSizeDesc": "Number of tasks shown per page in the task list",
+    "resetData": "Reset data",
+    "resetDataDesc": "Delete all tasks and preferences. This cannot be undone.",
+    "resetConfirm": "Confirm reset",
+    "resetWarning": "All tasks and preferences will be deleted. Continue?",
+    "saved": "Settings saved",
+    "resetDone": "Data has been reset"
+  }
+}

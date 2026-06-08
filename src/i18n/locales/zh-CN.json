@@ -1,0 +1,192 @@
+{
+  "sidebar": {
+    "logo": "工作项记录",
+    "subtitle": "本地工作追踪"
+  },
+  "nav": {
+    "dashboard": "统一面板",
+    "tasks": "事项列表",
+    "insights": "数据洞察",
+    "settings": "设置"
+  },
+  "pageMeta": {
+    "dashboard": {
+      "title": "统一面板",
+      "description": "聚合查看本月状态、逾期风险与最近更新。"
+    },
+    "tasks": {
+      "title": "事项列表",
+      "description": "记录、筛选并维护每月工作事项与未完成项。"
+    },
+    "insights": {
+      "title": "数据洞察",
+      "description": "按状态与优先级拆解任务分布，辅助月度复盘。"
+    }
+  },
+  "search": {
+    "placeholder": "搜索标题或说明"
+  },
+  "taskList": {
+    "title": "事项列表",
+    "subtitle": "按当前条件查看、编辑并跟进本月事项。",
+    "emptyTitle": "当前条件下没有事项",
+    "emptyDesc": "可以调整月份、状态、优先级或搜索条件，也可以直接新增事项。"
+  },
+  "taskCard": {
+    "edit": "编辑",
+    "delete": "删除",
+    "noDescription": "暂无补充说明。",
+    "due": "截止",
+    "from": "结转自",
+    "changeStatus": "修改状态"
+  },
+  "stats": {
+    "total": "总数",
+    "done": "已完成",
+    "open": "进行中/未完成"
+  },
+  "pagination": {
+    "prev": "上一页",
+    "next": "下一页",
+    "info": "{total} 条 · 第 {page} / {totalPages} 页"
+  },
+  "filter": {
+    "year": "年份",
+    "month": "月份",
+    "status": "状态",
+    "priority": "优先级",
+    "sort": "排序",
+    "selectYear": "选择年份",
+    "selectMonth": "选择月份",
+    "selectStatus": "选择状态",
+    "selectPriority": "选择优先级",
+    "sortBy": "选择排序方式",
+    "summary": "结果摘要",
+    "perPage": "每页条数",
+    "itemsPerPage": "选择每页条数",
+    "addTask": "新增事项",
+    "more": "更多操作",
+    "importDemo": "导入示例数据",
+    "importMerge": "导入 JSON（合并）",
+    "importReplace": "导入 JSON（覆盖）",
+    "export": "导出 JSON",
+    "carryOver": "结转上月未完成"
+  },
+  "form": {
+    "newTask": "新增事项",
+    "editTask": "编辑事项",
+    "desc": "填写标题、说明、状态、优先级和截止日期，保存后会立即更新列表。",
+    "cancel": "取消",
+    "save": "保存事项",
+    "saving": "保存中...",
+    "title": "标题",
+    "titlePlaceholder": "例如：整理月度复盘素材",
+    "description": "内容说明",
+    "descPlaceholder": "补充事项背景、输出物、风险点或跟进说明",
+    "status": "状态",
+    "selectStatus": "选择状态",
+    "priority": "优先级",
+    "selectPriority": "选择优先级",
+    "dueDate": "截止日期",
+    "dueDatePlaceholder": "可选，不设置则不参与逾期判断",
+    "close": "关闭弹窗"
+  },
+  "confirm": {
+    "cancel": "取消",
+    "confirm": "确认"
+  },
+  "datePicker": {
+    "noDate": "未设置截止日期",
+    "due": "截止日期",
+    "clear": "清空"
+  },
+  "menu": {
+    "select": "请选择",
+    "close": "关闭"
+  },
+  "status": {
+    "todo": "未开始",
+    "doing": "进行中",
+    "done": "已完成",
+    "paused": "搁置"
+  },
+  "priority": {
+    "high": "高",
+    "medium": "中",
+    "low": "低"
+  },
+  "dashboard": {
+    "total": "本月总数",
+    "done": "已完成",
+    "inProgress": "进行中",
+    "overdue": "逾期风险",
+    "status": "状态分布",
+    "statusSubtitle": "共 {total} 项",
+    "priority": "优先级分布",
+    "prioritySubtitle": "当前月份",
+    "recentUpdates": "最近更新",
+    "recentSubtitle": "便于快速回看最近修改的事项。",
+    "noRecent": "当前月份还没有可展示的最近更新记录。",
+    "noDescription": "暂无补充说明。"
+  },
+  "insights": {
+    "statusBreakdown": "状态拆解",
+    "statusDesc": "查看当前月份在各状态下的事项分布和含义。",
+    "priorityBreakdown": "优先级拆解",
+    "priorityDesc": "识别高优先级事项占比，辅助安排当月推进顺序。",
+    "completionRate": "本月完成率",
+    "completionDesc": "按当前筛选月份统计已完成事项占比。",
+    "doneOf": "已完成 {done} / {total}",
+    "statusColumn": "状态",
+    "countColumn": "数量",
+    "meaningColumn": "说明",
+    "statusDoneDesc": "已闭环事项数",
+    "statusDoingDesc": "正在推进中的事项",
+    "statusTodoDesc": "尚未启动的事项",
+    "statusPausedDesc": "暂时挂起或待定事项",
+    "priorityHighDesc": "需要优先推动的任务",
+    "priorityMediumDesc": "常规推进任务",
+    "priorityLowDesc": "低风险或补充性任务"
+  },
+  "toast": {
+    "initFailed": "初始化失败：{message}",
+    "unknownError": "未知错误",
+    "taskCreated": "事项已新增",
+    "taskUpdated": "事项已更新",
+    "taskDeleted": "事项已删除",
+    "createFailed": "新增失败：{message}",
+    "updateFailed": "更新失败：{message}",
+    "deleteFailed": "删除失败：{message}",
+    "listRefreshFailed": "列表刷新失败：{message}",
+    "initRefreshFailed": "初始化失败：{message}",
+    "noCarryItems": "没有可结转的事项",
+    "carriedOver": "已结转 {count} 条事项",
+    "carryFailed": "结转失败：{message}",
+    "importDone": "导入完成：成功 {imported} 条，跳过 {skipped} 条",
+    "importFailed": "导入失败：{message}",
+    "importParseFailed": "导入文件解析失败",
+    "seedExists": "示例数据已存在，无需重复导入",
+    "seedDone": "已补充 {count} 条示例数据",
+    "seedFailed": "示例数据导入失败：{message}",
+    "exportFailed": "导出失败：{message}",
+    "exportDone": "JSON 已导出",
+    "createRefreshFailed": "新增后刷新失败",
+    "updateRefreshFailed": "更新后刷新失败",
+    "deleteRefreshFailed": "删除后刷新失败"
+  },
+  "language": "语言",
+  "settings": {
+    "title": "个性化设置",
+    "desc": "调整显示偏好和行为选项，所有更改即时生效。",
+    "recentLimit": "最近更新显示数量",
+    "recentLimitDesc": "Dashboard 面板中最近更新区域显示的最大条数",
+    "pageSize": "默认每页条数",
+    "pageSizeDesc": "事项列表每页显示的任务数量",
+    "resetData": "重置数据",
+    "resetDataDesc": "删除所有任务数据和偏好设置，此操作不可撤销",
+    "resetConfirm": "确认重置",
+    "resetWarning": "将删除所有工作项和偏好设置。确定继续？",
+    "saved": "设置已保存",
+    "resetDone": "数据已重置"
+  }
+}
