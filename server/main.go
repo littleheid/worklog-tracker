@@ -46,7 +46,7 @@ func main() {
 		installAutoStart(port, dd)
 
 	case "version":
-		fmt.Println("worklog-tracker v0.2.2")
+		fmt.Println("worklog-tracker v0.2.3")
 
 	case "uninstall":
 		uninstallAutoStart(dd)
