@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useOverlayPanel } from "../../composables/useOverlayPanel";
+import {nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {useOverlayPanel} from "../../composables/useOverlayPanel";
 
 const props = withDefaults(defineProps<{
   label: string; disabled?: boolean; align?: "left" | "right";
