@@ -14,13 +14,11 @@
 
 ## 安装
 
-```bash
-# Homebrew
-brew install littleheid/worklog-tracker/worklog-tracker
-
-# 或直接下载二进制
-# https://github.com/littleheid/worklog-tracker/releases
-```
+| 平台 | 命令 |
+|------|------|
+| macOS | `brew install littleheid/worklog-tracker/worklog-tracker` |
+| Windows | `scoop bucket add littleheid https://github.com/littleheid/scoop-worklog-tracker && scoop install worklog-tracker` |
+| Linux | [下载二进制](https://github.com/littleheid/worklog-tracker/releases/latest) |
 
 ## 使用
 
