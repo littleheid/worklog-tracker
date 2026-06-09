@@ -2,25 +2,25 @@
 class WorklogTracker < Formula
   desc "Personal local task tracker with SQLite storage"
   homepage "https://github.com/littleheid/worklog-tracker"
-  version "0.2.2"
+  version "0.2.3"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/littleheid/worklog-tracker/releases/download/v0.2.2/worklog-tracker_0.2.2_darwin_arm64"
-      sha256 "37e717a9f77206af94466c9a41bcc63ca62445bdb0cbf0e168effd7a0a154146"
+      url "https://github.com/littleheid/worklog-tracker/releases/download/v0.2.3/worklog-tracker_0.2.3_darwin_arm64"
+      sha256 "14becc1d48de60c59a33c242d53161885254e57d669a9af1b83a58521fe19a77"
     else
-      url "https://github.com/littleheid/worklog-tracker/releases/download/v0.2.2/worklog-tracker_0.2.2_darwin_amd64"
-      sha256 "35110d714a813b1bf20a9b2b6f1803253ca09451994568b18ecc1d7af6f31fe2"
+      url "https://github.com/littleheid/worklog-tracker/releases/download/v0.2.3/worklog-tracker_0.2.3_darwin_amd64"
+      sha256 "5ba6f14add8aa26be071a9bdcb785a5b0d6f8baa848831bf0458d689fcfd3b3b"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/littleheid/worklog-tracker/releases/download/v0.2.2/worklog-tracker_0.2.2_linux_arm64"
-      sha256 "095c16d5650b3ac94512318aaae2b967d17534397512ce5eb885486bfce4f25a"
+      url "https://github.com/littleheid/worklog-tracker/releases/download/v0.2.3/worklog-tracker_0.2.3_linux_arm64"
+      sha256 "30680b53783e9bbfdb086fb85fe725850919c4b2c713de9bf8662cfd3f4daabe"
     else
-      url "https://github.com/littleheid/worklog-tracker/releases/download/v0.2.2/worklog-tracker_0.2.2_linux_amd64"
-      sha256 "56c0072acc9fc2f5c2184e0f2a98dc9253b6fdc1e83db11448a78ae55b8c3efe"
+      url "https://github.com/littleheid/worklog-tracker/releases/download/v0.2.3/worklog-tracker_0.2.3_linux_amd64"
+      sha256 "441eba72822c3e34fa92a7527ff4017bf120e20b8bea957048063fb8ded9a232"
     end
   end
 
