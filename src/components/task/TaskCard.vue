@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { TASK_STATUS_OPTIONS } from "../../constants/task";
+import { useTaskOptions } from "../../composables/useTaskOptions";
 import type { Task, TaskStatus } from "../../types/task";
 import { formatDateTime } from "../../utils/date";
 import MenuSelect from "../common/MenuSelect.vue";
@@ -13,6 +13,7 @@ const emit = defineEmits<{
   click: [task: Task];
 }>();
 const { t } = useI18n();
+const { taskStatusOptions } = useTaskOptions();
 
 const statusDot = computed(() => {
   const m: Record<string, string> = { todo: "bg-amber-400", doing: "bg-blue-400", done: "bg-emerald-400", paused: "bg-stone-300" };
@@ -79,7 +80,7 @@ function tagColor(tag: string): string {
 
     <!-- 操作栏（hover 显示，始终占位） -->
     <div class="mt-3 pt-3 border-t border-white/20 flex items-center justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-      <MenuSelect :model-value="task.status" :options="TASK_STATUS_OPTIONS" compact align="left"
+      <MenuSelect :model-value="task.status" :options="taskStatusOptions" compact align="left"
         :panel-title="t('taskCard.changeStatus')"
         @update:model-value="emit('status-change', { id: task.id, status: $event as TaskStatus })" />
       <button type="button"

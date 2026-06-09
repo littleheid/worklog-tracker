@@ -6,7 +6,7 @@ import MenuSelect from "./MenuSelect.vue";
 
 const props = defineProps<{ modelValue: string | null; placeholder?: string; }>();
 const emit = defineEmits<{ "update:modelValue": [value: string | null]; }>();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 function daysInMonth(y: string, m: string): number { return new Date(Number(y), Number(m), 0).getDate(); }
 
@@ -16,8 +16,20 @@ const parsed = computed(() => {
   return { year: m[1], month: m[2], day: m[3], hasValue: true };
 });
 
-const yearOptions = computed(() => buildYearOptions(Number(parsed.value.year), [parsed.value.year]));
-const monthOptions = computed(() => buildMonthOptions());
+const monthOptions = computed(() =>
+  buildMonthOptions(
+    Array.from({ length: 12 }, (_, i) =>
+      new Intl.DateTimeFormat(locale.value, { month: "short" }).format(new Date(2024, i, 1))
+    )
+  )
+);
+
+const yearOptions = computed(() =>
+  buildYearOptions(Number(parsed.value.year), [parsed.value.year]).map(o => ({
+    label: `${o.value}${t("datePicker.yearSuffix")}`,
+    value: o.value
+  }))
+);
 const dayOptions = computed(() => Array.from({ length: daysInMonth(parsed.value.year, parsed.value.month) }, (_, i) => ({ label: `${pad2(i + 1)}`, value: pad2(i + 1) })));
 const previewLabel = computed(() => !parsed.value.hasValue || !props.modelValue ? (props.placeholder ?? t("datePicker.noDate")) : `${t("datePicker.due")}: ${props.modelValue}`);
 
@@ -34,7 +46,7 @@ function clearValue() { emit("update:modelValue", null); }
     <div class="grid gap-2.5 md:grid-cols-3">
       <MenuSelect :model-value="parsed.year" :options="yearOptions" full-width compact :panel-title="t('filter.selectYear')" :panel-columns="2" @update:model-value="updatePart('year', $event)" />
       <MenuSelect :model-value="parsed.month" :options="monthOptions" full-width compact :panel-title="t('filter.selectMonth')" :panel-columns="3" @update:model-value="updatePart('month', $event)" />
-      <MenuSelect :model-value="parsed.day" :options="dayOptions" full-width compact panel-title="Select day" @update:model-value="updatePart('day', $event)" />
+      <MenuSelect :model-value="parsed.day" :options="dayOptions" full-width compact :panel-title="t('filter.selectDay')" @update:model-value="updatePart('day', $event)" />
     </div>
     <div class="flex flex-wrap items-center justify-between gap-2">
       <span class="text-[13px] leading-5 text-slate-500">{{ previewLabel }}</span>

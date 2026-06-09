@@ -40,13 +40,14 @@ export function buildYearOptions(
 
   return [...years]
     .sort((left, right) => Number(right) - Number(left))
-    .map((year) => ({ label: `${year}年`, value: year }));
+    .map((year) => ({ label: String(year), value: String(year) }));
 }
 
-export function buildMonthOptions(): Array<{ label: string; value: string }> {
+export function buildMonthOptions(labels?: string[]): Array<{ label: string; value: string }> {
   return Array.from({ length: 12 }, (_, index) => {
     const month = pad2(index + 1);
-    return { label: `${month}月`, value: month };
+    const label = labels?.[index] ?? `${month}月`;
+    return { label, value: month };
   });
 }
 

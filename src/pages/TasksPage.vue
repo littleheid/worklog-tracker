@@ -9,13 +9,14 @@ import MenuSelect from "../components/common/MenuSelect.vue";
 import { useTasksPageInteractions } from "../composables/useTasksPageInteractions";
 import { useTaskStore } from "../stores/taskStore";
 import { useUiStore } from "../stores/uiStore";
-import { STATUS_OPTIONS, PRIORITY_OPTIONS, SORT_OPTIONS } from "../constants/task";
+import { useTaskOptions } from "../composables/useTaskOptions";
 import { buildMonthOptions, buildYearOptions, monthToParts } from "../utils/date";
 import type { Task } from "../types/task";
 
 const taskStore = useTaskStore();
 const uiStore = useUiStore();
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const { statusOptions, priorityOptions, sortOptions } = useTaskOptions();
 const { items, loading, pagination, query, saving } = storeToRefs(taskStore);
 
 const {
@@ -39,9 +40,18 @@ function onCardClick(task: Task) { openEditModal(task); }
 const monthParts = computed(() => monthToParts(query.value.month));
 const yearOptions = computed(() => {
   const years = taskStore.availableMonths.map((m: string) => m.slice(0, 4));
-  return buildYearOptions(undefined, [...years, monthParts.value.year]);
+  return buildYearOptions(undefined, [...years, monthParts.value.year]).map(o => ({
+    label: `${o.value}${t("datePicker.yearSuffix")}`,
+    value: o.value
+  }));
 });
-const monthOptions = computed(() => buildMonthOptions());
+const monthOptions = computed(() =>
+  buildMonthOptions(
+    Array.from({ length: 12 }, (_, i) =>
+      new Intl.DateTimeFormat(locale.value, { month: "short" }).format(new Date(2024, i, 1))
+    )
+  )
+);
 function updateYear(y: string) { taskStore.setQuery({ month: `${y}-${monthParts.value.month}` }); }
 function updateMonth(m: string) { taskStore.setQuery({ month: `${monthParts.value.year}-${m}` }); }
 function onKeywordInput(e: Event) { taskStore.setQuery({ keyword: (e.target as HTMLInputElement).value }); }
@@ -57,9 +67,9 @@ function onKeywordInput(e: Event) { taskStore.setQuery({ keyword: (e.target as H
       </div>
       <div class="h-5 w-px bg-stone-200/60 hidden md:block"></div>
       <div class="flex items-center gap-2">
-        <MenuSelect :model-value="query.status" :options="STATUS_OPTIONS" compact @update:model-value="handleStatusFilterChange" />
-        <MenuSelect :model-value="query.priority" :options="PRIORITY_OPTIONS" compact @update:model-value="handlePriorityFilterChange" />
-        <MenuSelect :model-value="query.sortBy" :options="SORT_OPTIONS" compact @update:model-value="handleSortChange" />
+        <MenuSelect :model-value="query.status" :options="statusOptions" compact @update:model-value="handleStatusFilterChange" />
+        <MenuSelect :model-value="query.priority" :options="priorityOptions" compact @update:model-value="handlePriorityFilterChange" />
+        <MenuSelect :model-value="query.sortBy" :options="sortOptions" compact @update:model-value="handleSortChange" />
       </div>
       <div class="h-5 w-px bg-stone-200/60 hidden md:block"></div>
       <input :value="query.keyword" type="text" :placeholder="t('search.placeholder')"

@@ -51,6 +51,7 @@
     "info": "{total} items · Page {page} of {totalPages}"
   },
   "filter": {
+    "all": "All",
     "year": "Year",
     "month": "Month",
     "status": "Status",
@@ -60,6 +61,7 @@
     "selectMonth": "Select month",
     "selectStatus": "Select status",
     "selectPriority": "Select priority",
+    "selectDay": "Select day",
     "sortBy": "Sort by",
     "summary": "Summary",
     "perPage": "Per page",
@@ -71,6 +73,13 @@
     "importReplace": "Import JSON (replace)",
     "export": "Export JSON",
     "carryOver": "Carry over last month"
+  },
+  "sort": {
+    "updated_desc": "Recently updated",
+    "updated_asc": "Oldest updated",
+    "created_desc": "Created",
+    "due_asc": "Due date",
+    "priority_desc": "Priority"
   },
   "form": {
     "newTask": "New Task",
@@ -99,7 +108,9 @@
   "datePicker": {
     "noDate": "No due date",
     "due": "Due",
-    "clear": "Clear"
+    "clear": "Clear",
+    "yearSuffix": "",
+    "monthSuffix": ""
   },
   "menu": {
     "select": "Select",

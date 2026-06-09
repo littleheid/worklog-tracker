@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "../../constants/task";
+import { useTaskOptions } from "../../composables/useTaskOptions";
 import type { TaskDraft, TaskPriority, TaskStatus } from "../../types/task";
 import DateValuePicker from "../common/DateValuePicker.vue";
 import MenuSelect from "../common/MenuSelect.vue";
@@ -9,6 +9,7 @@ import TagInput from "../common/TagInput.vue";
 const form = defineModel<TaskDraft>({ required: true });
 defineProps<{ error?: boolean }>();
 const { t } = useI18n();
+const { taskStatusOptions, taskPriorityOptions } = useTaskOptions();
 </script>
 
 <template>
@@ -39,14 +40,14 @@ const { t } = useI18n();
     <!-- 状态 -->
     <label>
       <span class="mb-1.5 block text-[13px] font-semibold text-stone-700">{{ t("form.status") }}</span>
-      <MenuSelect :model-value="form.status" :options="TASK_STATUS_OPTIONS" full-width :panel-title="t('form.selectStatus')"
+      <MenuSelect :model-value="form.status" :options="taskStatusOptions" full-width :panel-title="t('form.selectStatus')"
         @update:model-value="form.status = $event as TaskStatus" />
     </label>
 
     <!-- 优先级 -->
     <label>
       <span class="mb-1.5 block text-[13px] font-semibold text-stone-700">{{ t("form.priority") }}</span>
-      <MenuSelect :model-value="form.priority" :options="TASK_PRIORITY_OPTIONS" full-width :panel-title="t('form.selectPriority')"
+      <MenuSelect :model-value="form.priority" :options="taskPriorityOptions" full-width :panel-title="t('form.selectPriority')"
         @update:model-value="form.priority = $event as TaskPriority" />
     </label>
 

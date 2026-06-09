@@ -51,6 +51,7 @@
     "info": "{total} 条 · 第 {page} / {totalPages} 页"
   },
   "filter": {
+    "all": "全部",
     "year": "年份",
     "month": "月份",
     "status": "状态",
@@ -60,6 +61,7 @@
     "selectMonth": "选择月份",
     "selectStatus": "选择状态",
     "selectPriority": "选择优先级",
+    "selectDay": "选择日期",
     "sortBy": "选择排序方式",
     "summary": "结果摘要",
     "perPage": "每页条数",
@@ -71,6 +73,13 @@
     "importReplace": "导入 JSON（覆盖）",
     "export": "导出 JSON",
     "carryOver": "结转上月未完成"
+  },
+  "sort": {
+    "updated_desc": "最近更新",
+    "updated_asc": "最早更新",
+    "created_desc": "创建时间",
+    "due_asc": "截止时间",
+    "priority_desc": "优先级"
   },
   "form": {
     "newTask": "新增事项",
@@ -99,7 +108,9 @@
   "datePicker": {
     "noDate": "未设置截止日期",
     "due": "截止日期",
-    "clear": "清空"
+    "clear": "清空",
+    "yearSuffix": "年",
+    "monthSuffix": "月"
   },
   "menu": {
     "select": "请选择",
