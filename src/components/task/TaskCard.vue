@@ -57,7 +57,7 @@ function tagColor(tag: string): string {
     <h3 class="text-[17px] font-bold text-stone-800 leading-7 line-clamp-2">{{ task.title }}</h3>
 
     <!-- 描述 -->
-    <p class="line-clamp-2 mt-2 text-[14px] leading-6 text-stone-500">
+    <p class="mt-2 whitespace-pre-line text-[14px] leading-6 text-stone-500">
       {{ task.detail || t("taskCard.noDescription") }}
     </p>
 

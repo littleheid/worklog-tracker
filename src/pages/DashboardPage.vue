@@ -101,7 +101,7 @@ function ratio(v: number): number { return taskStore.dashboard.total === 0 ? 0 :
           </div>
 
           <h3 class="text-[15px] font-bold text-stone-800 line-clamp-1">{{ task.title }}</h3>
-          <p class="line-clamp-2 mt-1.5 text-[13px] leading-5 text-stone-500">{{ task.detail || t("dashboard.noDescription") }}</p>
+          <p class="mt-1.5 whitespace-pre-line text-[13px] leading-5 text-stone-500">{{ task.detail || t("dashboard.noDescription") }}</p>
 
           <div class="mt-2 flex flex-wrap items-center gap-1.5">
             <span v-if="task.dueDate" class="inline-flex items-center gap-1 rounded-md bg-amber-100/70 px-2 py-0.5 text-[11px] shadow-sm font-semibold text-amber-700">
