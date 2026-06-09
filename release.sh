@@ -14,7 +14,7 @@ cp -r dist server/dist
 
 echo "=== 3. 跨平台编译 Go ==="
 export CGO_ENABLED=0
-PLATFORMS=("darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64")
+PLATFORMS=("darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64" "windows/amd64" "windows/arm64")
 
 mkdir -p release
 

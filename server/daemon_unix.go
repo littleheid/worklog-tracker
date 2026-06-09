@@ -1,3 +1,5 @@
+//go:build !windows
+
 package main
 
 import (
@@ -9,10 +11,6 @@ import (
 	"strconv"
 	"syscall"
 )
-
-func pidFile(dataDir string) string {
-	return filepath.Join(dataDir, "worklog.pid")
-}
 
 func startDaemon(port int, dataDir string) {
 	// 检查是否已在运行
