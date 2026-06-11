@@ -5,14 +5,10 @@ cd "$(dirname "$0")"
 
 VERSION=${1:?Usage: $0 <version, e.g. 0.1.0>}
 
-echo "=== 1. 构建前端 ==="
+echo "=== 1. 构建前端（输出至 server/dist）==="
 npm run build
 
-echo "=== 2. 复制前端产物到 server/dist ==="
-rm -rf server/dist
-cp -r dist server/dist
-
-echo "=== 3. 跨平台编译 Go ==="
+echo "=== 2. 跨平台编译 Go ==="
 export CGO_ENABLED=0
 PLATFORMS=("darwin/amd64" "darwin/arm64" "linux/amd64" "linux/arm64" "windows/amd64" "windows/arm64")
 
