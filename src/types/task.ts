@@ -6,6 +6,7 @@ export type TaskSortBy =
   | "created_desc"
   | "due_asc"
   | "priority_desc";
+export type TaskVisibility = "work" | "personal";
 
 export interface Task {
   id: string;
@@ -18,6 +19,8 @@ export interface Task {
   carryFrom: string | null;
   sourceTaskId: string | null;
   tags: string[];
+  visibility: TaskVisibility;
+  category: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -32,6 +35,8 @@ export interface TaskDraft {
   carryFrom?: string | null;
   sourceTaskId?: string | null;
   tags?: string[];
+  visibility?: TaskVisibility;
+  category?: string;
 }
 
 export interface TaskQuery {
@@ -40,6 +45,8 @@ export interface TaskQuery {
   priority?: "all" | TaskPriority;
   keyword?: string;
   sortBy?: TaskSortBy;
+  visibility?: "" | "work" | "personal";
+  category?: string;
 }
 
 export interface TaskPagedQuery extends TaskQuery {
@@ -81,4 +88,10 @@ export interface UiPrefs {
   activePage?: "dashboard" | "tasks" | "insights";
   listDensity?: "compact" | "comfortable";
   pageSize?: number;
+}
+
+// CategoryGroup 定义分类组：一个 group 下包含多个 item（叶子分类名），用于 UI 渲染和持久化
+export interface CategoryGroup {
+  group: string;
+  items: string[];
 }

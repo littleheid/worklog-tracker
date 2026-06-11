@@ -38,6 +38,8 @@ function tagColor(tag: string): string {
   for (let i = 0; i < tag.length; i++) { hash = ((hash << 5) - hash) + tag.charCodeAt(i); hash |= 0; }
   return `tag-${Math.abs(hash) % 8}`;
 }
+
+const categoryLabel = computed(() => props.task.category || "");
 </script>
 
 <template>
@@ -64,6 +66,9 @@ function tagColor(tag: string): string {
 
     <!-- 截止日期 + 标签 -->
     <div class="mt-3 flex flex-wrap items-center gap-2">
+      <span v-if="task.category" class="inline-flex items-center gap-1 rounded-md bg-stone-100/70 px-2 py-0.5 text-[11px] font-semibold text-stone-500">
+        📁 {{ categoryLabel }}
+      </span>
       <span v-if="dueInfo" class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-semibold" :class="dueInfo.style">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z" /></svg>
         {{ dueInfo.label }} {{ task.dueDate }}

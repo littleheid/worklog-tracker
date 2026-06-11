@@ -36,6 +36,8 @@ export const useTaskStore = defineStore("tasks", {
       priority: "all" as "all" | TaskPriority,
       keyword: "",
       sortBy: "updated_desc" as TaskSortBy,
+      visibility: "" as "" | "work" | "personal",
+      category: "",
       page: 1,
       pageSize: 10
     },
@@ -89,10 +91,12 @@ export const useTaskStore = defineStore("tasks", {
       this.loadError = null;
 
       try {
+        const uiStore = useUiStore();
+        const visibility = uiStore.visibilityMode || "";
         const [paged, stats, dashboard, availableMonths] = await Promise.all([
-          taskApi.listPaged(querySnapshot),
-          taskApi.monthlyStats(querySnapshot.month),
-          taskApi.dashboardStats(querySnapshot.month, this.recentLimit),
+          taskApi.listPaged({ ...querySnapshot, visibility }),
+          taskApi.monthlyStats(querySnapshot.month, visibility),
+          taskApi.dashboardStats(querySnapshot.month, this.recentLimit, visibility),
           taskApi.listAvailableMonths()
         ]);
 
@@ -119,9 +123,10 @@ export const useTaskStore = defineStore("tasks", {
     async setQuery(patch: Partial<{
       month: string; status: "all" | TaskStatus; priority: "all" | TaskPriority;
       keyword: string; sortBy: TaskSortBy; page: number; pageSize: number;
+      category?: string;
     }>) {
       const shouldResetPage = patch.page === undefined &&
-        ["month","status","priority","keyword","sortBy","pageSize"].some(k => Object.prototype.hasOwnProperty.call(patch, k));
+        ["month","status","priority","keyword","sortBy","pageSize","category"].some(k => Object.prototype.hasOwnProperty.call(patch, k));
       const nextPage = patch.page ?? (shouldResetPage ? 1 : this.query.page);
       this.query = { ...this.query, ...patch, page: nextPage };
       if (patch.pageSize) await prefsApi.set("pageSize", patch.pageSize);
@@ -212,8 +217,13 @@ export const useTaskStore = defineStore("tasks", {
     },
 
     async exportJson() {
-      try { return await taskApi.getAll(); }
-      catch (error) { useUiStore().pushToast(t("toast.exportFailed", { message: getErrorMessage(error, t("toast.unknownError")) }), "error"); throw error; }
+      try {
+        const uiStore = useUiStore();
+        return await taskApi.getAll(uiStore.visibilityMode || "");
+      } catch (error) {
+        useUiStore().pushToast(t("toast.exportFailed", { message: getErrorMessage(error, t("toast.unknownError")) }), "error");
+        throw error;
+      }
     }
   }
 });

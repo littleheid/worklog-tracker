@@ -3,6 +3,7 @@ import { computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import TopNav from "./components/layout/TopNav.vue";
 import ToastStack from "./components/common/ToastStack.vue";
+import PasswordModal from "./components/common/PasswordModal.vue";
 import DashboardPage from "./pages/DashboardPage.vue";
 import InsightsPage from "./pages/InsightsPage.vue";
 import SettingsPage from "./pages/SettingsPage.vue";
@@ -58,5 +59,6 @@ onMounted(async () => {
     </div>
 
     <ToastStack :items="uiStore.toasts" @dismiss="uiStore.dismissToast" />
+    <PasswordModal v-if="uiStore.showUnlockModal" @close="uiStore.closeUnlockModal" />
   </div>
 </template>

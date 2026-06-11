@@ -193,7 +193,9 @@ export function normalizeImportedTask(raw: unknown): Task | null {
     sourceTaskId: item.sourceTaskId ?? null,
     createdAt: typeof item.createdAt === "number" ? item.createdAt : now,
     updatedAt: typeof item.updatedAt === "number" ? item.updatedAt : now,
-    tags: Array.isArray(item.tags) ? item.tags : []
+    tags: Array.isArray(item.tags) ? item.tags : [],
+    visibility: (item.visibility === "personal" ? "personal" : "work") as Task["visibility"],
+    category: typeof item.category === "string" ? item.category : ""
   };
 
   try {
@@ -219,25 +221,29 @@ export function createSeedTasks(): Task[] {
       title: "跟进跨部门联调问题",
       detail: "收敛接口差异点并记录确认项，形成联调清单。",
       month, status: "paused", priority: "high",
-      dueDate: `${month}-18`, carryFrom: null, sourceTaskId: null, tags: ["后端", "联调"]
+      dueDate: `${month}-18`, carryFrom: null, sourceTaskId: null, tags: ["后端", "联调"],
+      visibility: "work" as const, category: "后端"
     },
     {
       title: "验证导出备份流程",
       detail: "执行一次 JSON 导出并抽样核对关键字段。",
       month, status: "todo", priority: "low",
-      dueDate: `${month}-08`, carryFrom: null, sourceTaskId: null, tags: ["工具", "测试"]
+      dueDate: `${month}-08`, carryFrom: null, sourceTaskId: null, tags: ["工具", "测试"],
+      visibility: "work" as const, category: ""
     },
     {
       title: "整理月度复盘素材",
       detail: "梳理本月上线项、延期项和风险事项，准备复盘会议。",
       month, status: "doing", priority: "medium",
-      dueDate: `${month}-25`, carryFrom: null, sourceTaskId: null, tags: ["管理", "报告"]
+      dueDate: `${month}-25`, carryFrom: null, sourceTaskId: null, tags: ["管理", "报告"],
+      visibility: "work" as const, category: "绩效"
     },
     {
       title: "结转上月未完成需求",
       detail: "核对上一月份遗留问题并安排新的截止时间。",
       month: previous, status: "todo", priority: "high",
-      dueDate: `${previous}-28`, carryFrom: null, sourceTaskId: null, tags: ["结转"]
+      dueDate: `${previous}-28`, carryFrom: null, sourceTaskId: null, tags: ["结转"],
+      visibility: "work" as const, category: ""
     }
   ];
 

@@ -3,7 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { useI18n } from "vue-i18n";
 import { useOverlayPanel } from "../../composables/useOverlayPanel";
 
-export interface OptionItem { label: string; value: string; }
+export interface OptionItem { label: string; value: string; disabled?: boolean; }
 
 const props = withDefaults(defineProps<{
   modelValue: string;
@@ -81,10 +81,11 @@ watch(open, async (v) => { if (!v) { restoreFocus.value?.focus(); restoreFocus.v
         <div class="grid max-h-[50vh] gap-1 overflow-y-auto" :class="optionGridClass">
           <button v-for="(item, index) in options" :key="item.value" type="button"
             class="rounded-lg px-3 py-2.5 text-left text-[14px] font-semibold transition-all duration-150"
-            :class="item.value === modelValue ? 'select-active' : 'text-slate-600 hover:bg-orange-50/60'"
+            :class="item.disabled ? 'col-span-full -mx-1.5 rounded-none border-t border-stone-200/60 pt-3 pb-1.5 text-[11px] font-extrabold text-stone-400 tracking-widest' : item.value === modelValue ? 'select-active' : 'text-slate-600 hover:bg-orange-50/60'"
             role="option" :aria-selected="item.value === modelValue"
             :data-option-current="item.value === modelValue" :data-option-index="index"
-            @click="selectValue(item.value)">{{ item.label }}</button>
+            :disabled="item.disabled" :tabindex="item.disabled ? -1 : 0"
+            @click="!item.disabled && selectValue(item.value)">{{ item.label }}</button>
         </div>
       </div>
     </div>
@@ -96,10 +97,11 @@ watch(open, async (v) => { if (!v) { restoreFocus.value?.focus(); restoreFocus.v
         <div class="grid gap-0.5" :class="optionGridClass">
           <button v-for="(item, index) in options" :key="item.value" type="button"
             class="rounded-lg px-3 py-2.5 text-left text-[14px] font-semibold transition-all duration-150"
-            :class="item.value === modelValue ? 'select-active' : 'text-slate-600 hover:bg-orange-50/60'"
+            :class="item.disabled ? 'col-span-full -mx-1.5 rounded-none border-t border-stone-200/60 pt-3 pb-1.5 text-[11px] font-extrabold text-stone-400 tracking-widest' : item.value === modelValue ? 'select-active' : 'text-slate-600 hover:bg-orange-50/60'"
             role="option" :aria-selected="item.value === modelValue"
             :data-option-current="item.value === modelValue" :data-option-index="index"
-            @click="selectValue(item.value)">{{ item.label }}</button>
+            :disabled="item.disabled" :tabindex="item.disabled ? -1 : 0"
+            @click="!item.disabled && selectValue(item.value)">{{ item.label }}</button>
         </div>
       </div>
     </Teleport>

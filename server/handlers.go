@@ -40,6 +40,15 @@ func runServer(port int, dataDir string) {
 	mux.HandleFunc("GET /api/prefs/{key}", func(w http.ResponseWriter, r *http.Request) { apiGetPref(w, r, db) })
 	mux.HandleFunc("PUT /api/prefs/{key}", func(w http.ResponseWriter, r *http.Request) { apiSetPref(w, r, db) })
 
+	// Auth
+	mux.HandleFunc("GET /api/auth/status", func(w http.ResponseWriter, r *http.Request) { apiAuthStatus(w, r, db) })
+	mux.HandleFunc("POST /api/auth/verify-password", func(w http.ResponseWriter, r *http.Request) { apiVerifyPassword(w, r, db) })
+	mux.HandleFunc("PUT /api/auth/set-password", func(w http.ResponseWriter, r *http.Request) { apiSetPassword(w, r, db) })
+
+	// Categories
+	mux.HandleFunc("GET /api/categories", func(w http.ResponseWriter, r *http.Request) { apiGetCategories(w, r, db) })
+	mux.HandleFunc("PUT /api/categories", func(w http.ResponseWriter, r *http.Request) { apiSetCategories(w, r, db) })
+
 	// 静态文件服务
 	distDir, err := fs.Sub(distFS, "dist")
 	if err != nil {
@@ -82,11 +91,13 @@ func errJSON(w http.ResponseWriter, code int, msg string) {
 func apiListTasks(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	q := r.URL.Query()
 	query := TaskQuery{
-		Month:    q.Get("month"),
-		Status:   q.Get("status"),
-		Priority: q.Get("priority"),
-		Keyword:  q.Get("keyword"),
-		SortBy:   q.Get("sortBy"),
+		Month:      q.Get("month"),
+		Status:     q.Get("status"),
+		Priority:   q.Get("priority"),
+		Keyword:    q.Get("keyword"),
+		SortBy:     q.Get("sortBy"),
+		Visibility: q.Get("visibility"),
+		Category:   q.Get("category"),
 	}
 	if p := q.Get("page"); p != "" {
 		query.Page, _ = strconv.Atoi(p)
@@ -173,7 +184,8 @@ func apiDashboard(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			maxRecent = n
 		}
 	}
-	stats, err := dashboardStats(db, month, maxRecent)
+	visibility := r.URL.Query().Get("visibility")
+	stats, err := dashboardStats(db, month, maxRecent, visibility)
 	if err != nil {
 		errJSON(w, 500, err.Error())
 		return
@@ -228,7 +240,8 @@ func apiImport(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 func apiExport(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	tasks, err := getAllTasks(db)
+	visibility := r.URL.Query().Get("visibility")
+	tasks, err := getAllTasks(db, visibility)
 	if err != nil {
 		errJSON(w, 500, err.Error())
 		return
@@ -266,6 +279,63 @@ func apiSetPref(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 	if err := setPref(db, key, body.Value); err != nil {
+		errJSON(w, 400, err.Error())
+		return
+	}
+	writeJSON(w, map[string]string{"ok": "saved"})
+}
+
+// --- Auth Handlers ---
+
+func apiAuthStatus(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	writeJSON(w, map[string]bool{"isSet": isPasswordSet(db)})
+}
+
+func apiVerifyPassword(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var body struct {
+		Password string `json:"password"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		errJSON(w, 400, "Invalid JSON")
+		return
+	}
+	writeJSON(w, map[string]bool{"ok": verifyPassword(db, body.Password)})
+}
+
+func apiSetPassword(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var body struct {
+		OldPassword string `json:"oldPassword"`
+		NewPassword string `json:"newPassword"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		errJSON(w, 400, "Invalid JSON")
+		return
+	}
+	if err := setPassword(db, body.OldPassword, body.NewPassword); err != nil {
+		errJSON(w, 400, err.Error())
+		return
+	}
+	writeJSON(w, map[string]string{"ok": "saved"})
+}
+
+// --- Categories Handlers ---
+
+func apiGetCategories(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	cats, err := getCategories(db)
+	if err != nil {
+		errJSON(w, 500, err.Error())
+		return
+	}
+	writeJSON(w, cats)
+}
+
+func apiSetCategories(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var groups []CategoryGroup
+	if err := json.NewDecoder(r.Body).Decode(&groups); err != nil {
+		errJSON(w, 400, "Invalid JSON")
+		return
+	}
+	if err := setCategories(db, groups); err != nil {
 		errJSON(w, 400, err.Error())
 		return
 	}

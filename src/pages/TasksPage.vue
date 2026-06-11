@@ -55,6 +55,32 @@ const monthOptions = computed(() =>
 function updateYear(y: string) { taskStore.setQuery({ month: `${y}-${monthParts.value.month}` }); }
 function updateMonth(m: string) { taskStore.setQuery({ month: `${monthParts.value.year}-${m}` }); }
 function onKeywordInput(e: Event) { taskStore.setQuery({ keyword: (e.target as HTMLInputElement).value }); }
+
+// Category grouping: lookup group name from CategoryGroup[] by leaf item name
+function categoryGroupName(leafCategory: string): string {
+  for (const group of uiStore.categoryOptions) {
+    if (group.items.includes(leafCategory)) return group.group;
+  }
+  return leafCategory || "未分类";
+}
+
+const groupedItems = computed(() => {
+  const groups = new Map<string, Task[]>();
+  for (const task of items.value) {
+    const group = task.category ? categoryGroupName(task.category) : "未分类";
+    if (!groups.has(group)) groups.set(group, []);
+    groups.get(group)!.push(task);
+  }
+  const entries = Array.from(groups.entries());
+  entries.sort(([a], [b]) => {
+    if (a === "未分类") return 1;
+    if (b === "未分类") return -1;
+    return a.localeCompare(b, "zh");
+  });
+  return entries;
+});
+
+const hasCategories = computed(() => uiStore.categoryOptions.length > 0);
 </script>
 
 <template>
@@ -94,10 +120,25 @@ function onKeywordInput(e: Event) { taskStore.setQuery({ keyword: (e.target as H
       <p class="mt-2 max-w-sm text-[14px] leading-5 text-stone-500">{{ t("taskList.emptyDesc") }}</p>
     </div>
 
-    <div v-else class="stagger-list grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-      <TaskCard v-for="task in items" :key="task.id" :task="task" density="comfortable"
-        @click="onCardClick" @edit="openEditModal" @delete="deletingTask = $event" @status-change="handleStatusChange" />
-    </div>
+    <!-- Grouped by category when categories exist; flat otherwise -->
+    <template v-else>
+      <div v-if="hasCategories && groupedItems.length > 0" class="space-y-5">
+        <div v-for="[group, tasks] in groupedItems" :key="group">
+          <div class="flex items-center gap-2 mb-3">
+            <h3 class="text-[15px] font-extrabold text-stone-700">📁 {{ group }}</h3>
+            <span class="badge-soft bg-white/50 text-stone-500 font-bold text-[12px]">{{ tasks.length }}</span>
+          </div>
+          <div class="stagger-list grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <TaskCard v-for="task in tasks" :key="task.id" :task="task" density="comfortable"
+              @click="onCardClick" @edit="openEditModal" @delete="deletingTask = $event" @status-change="handleStatusChange" />
+          </div>
+        </div>
+      </div>
+      <div v-else class="stagger-list grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <TaskCard v-for="task in items" :key="task.id" :task="task" density="comfortable"
+          @click="onCardClick" @edit="openEditModal" @delete="deletingTask = $event" @status-change="handleStatusChange" />
+      </div>
+    </template>
 
     <!-- Pagination -->
     <div v-if="pagination.totalPages > 1" class="glass rounded-2xl px-4 py-3 flex items-center justify-between">

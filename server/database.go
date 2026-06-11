@@ -10,6 +10,7 @@ import (
 	"time"
 
 	_ "modernc.org/sqlite"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func openDB(dataDir string) (*sql.DB, error) {
@@ -57,7 +58,14 @@ func createTask(db *sql.DB, input TaskInput) (Task, error) {
 	if len(detail) > 5000 {
 		return Task{}, fmt.Errorf("detail too long (max 5000)")
 	}
+	if input.Category != "" && len(input.Category) > 100 {
+		return Task{}, fmt.Errorf("category too long (max 100)")
+	}
 	ts := now()
+	vis := input.Visibility
+	if vis != "personal" {
+		vis = "work"
+	}
 	t := Task{
 		ID:           genID(),
 		Title:        title,
@@ -68,6 +76,8 @@ func createTask(db *sql.DB, input TaskInput) (Task, error) {
 		DueDate:      input.DueDate,
 		CarryFrom:    input.CarryFrom,
 		SourceTaskID: input.SourceTaskID,
+		Visibility:   vis,
+		Category:     strings.TrimSpace(input.Category),
 		CreatedAt:    ts,
 		UpdatedAt:    ts,
 	}
@@ -84,14 +94,14 @@ func createTask(db *sql.DB, input TaskInput) (Task, error) {
 	}
 	t.Tags = json.RawMessage(tagsJSON)
 
-	_, err := db.Exec(`INSERT INTO tasks (id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,created_at,updated_at)
-		VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
-		t.ID, t.Title, t.Detail, t.Month, t.Status, t.Priority, t.DueDate, t.CarryFrom, t.SourceTaskID, tagsJSON, t.CreatedAt, t.UpdatedAt)
+	_, err := db.Exec(`INSERT INTO tasks (id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,visibility,category,created_at,updated_at)
+		VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+		t.ID, t.Title, t.Detail, t.Month, t.Status, t.Priority, t.DueDate, t.CarryFrom, t.SourceTaskID, tagsJSON, t.Visibility, t.Category, t.CreatedAt, t.UpdatedAt)
 	return t, err
 }
 
 func updateTask(db *sql.DB, id string, input TaskInput) (Task, error) {
-	row := db.QueryRow(`SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,created_at,updated_at FROM tasks WHERE id=?`, id)
+	row := db.QueryRow(`SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,visibility,category,created_at,updated_at FROM tasks WHERE id=?`, id)
 	t, err := scanRow(row)
 	if err != nil {
 		return Task{}, fmt.Errorf("task not found")
@@ -115,17 +125,21 @@ func updateTask(db *sql.DB, id string, input TaskInput) (Task, error) {
 	if input.Month != "" {
 		t.Month = input.Month
 	}
+	if input.Visibility != "" {
+		t.Visibility = input.Visibility
+	}
+	// category: explicitly update even when empty (user may clear it)
+	t.Category = strings.TrimSpace(input.Category)
 	t.UpdatedAt = now()
 
+	tagsJSON := string(t.Tags)
 	if len(input.Tags) > 0 {
-		tagsJSON := toJSON(input.Tags)
+		tagsJSON = toJSON(input.Tags)
 		t.Tags = json.RawMessage(tagsJSON)
-		_, err = db.Exec(`UPDATE tasks SET title=?,detail=?,month=?,status=?,priority=?,due_date=?,carry_from=?,source_task_id=?,tags=?,updated_at=? WHERE id=?`,
-			t.Title, t.Detail, t.Month, t.Status, t.Priority, t.DueDate, t.CarryFrom, t.SourceTaskID, tagsJSON, t.UpdatedAt, id)
-	} else {
-		_, err = db.Exec(`UPDATE tasks SET title=?,detail=?,month=?,status=?,priority=?,due_date=?,carry_from=?,source_task_id=?,updated_at=? WHERE id=?`,
-			t.Title, t.Detail, t.Month, t.Status, t.Priority, t.DueDate, t.CarryFrom, t.SourceTaskID, t.UpdatedAt, id)
 	}
+
+	_, err = db.Exec(`UPDATE tasks SET title=?,detail=?,month=?,status=?,priority=?,due_date=?,carry_from=?,source_task_id=?,tags=?,visibility=?,category=?,updated_at=? WHERE id=?`,
+		t.Title, t.Detail, t.Month, t.Status, t.Priority, t.DueDate, t.CarryFrom, t.SourceTaskID, tagsJSON, t.Visibility, t.Category, t.UpdatedAt, id)
 	return t, err
 }
 
@@ -135,7 +149,7 @@ func deleteTask(db *sql.DB, id string) error {
 }
 
 func getTask(db *sql.DB, id string) (Task, error) {
-	row := db.QueryRow(`SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,created_at,updated_at FROM tasks WHERE id=?`, id)
+	row := db.QueryRow(`SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,visibility,category,created_at,updated_at FROM tasks WHERE id=?`, id)
 	return scanRow(row)
 }
 
@@ -159,6 +173,16 @@ func listTasks(db *sql.DB, q TaskQuery) ([]Task, int, error) {
 		where = append(where, "(title LIKE ? OR detail LIKE ?)")
 		kw := "%" + q.Keyword + "%"
 		args = append(args, kw, kw)
+	}
+	if q.Visibility != "" {
+		where = append(where, "visibility=?")
+		args = append(args, q.Visibility)
+	} else {
+		where = append(where, "visibility!='personal'")
+	}
+	if q.Category != "" {
+		where = append(where, "category=?")
+		args = append(args, q.Category)
 	}
 
 	whereClause := strings.Join(where, " AND ")
@@ -189,7 +213,7 @@ func listTasks(db *sql.DB, q TaskQuery) ([]Task, int, error) {
 	}
 	offset := (q.Page - 1) * q.PageSize
 
-	query := fmt.Sprintf("SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,created_at,updated_at FROM tasks WHERE %s ORDER BY %s LIMIT ? OFFSET ?", whereClause, orderBy)
+	query := fmt.Sprintf("SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,visibility,category,created_at,updated_at FROM tasks WHERE %s ORDER BY %s LIMIT ? OFFSET ?", whereClause, orderBy)
 	args = append(args, q.PageSize, offset)
 
 	rows, err := db.Query(query, args...)
@@ -212,8 +236,17 @@ func listTasks(db *sql.DB, q TaskQuery) ([]Task, int, error) {
 	return tasks, total, nil
 }
 
-func getAllTasks(db *sql.DB) ([]Task, error) {
-	rows, err := db.Query(`SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,created_at,updated_at FROM tasks ORDER BY updated_at DESC`)
+func getAllTasks(db *sql.DB, visibility string) ([]Task, error) {
+	query := `SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,visibility,category,created_at,updated_at FROM tasks`
+	args := []interface{}{}
+	if visibility != "" {
+		query += ` WHERE visibility=?`
+		args = append(args, visibility)
+	} else {
+		query += ` WHERE visibility!='personal'`
+	}
+	query += ` ORDER BY updated_at DESC`
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +267,7 @@ func getAllTasks(db *sql.DB) ([]Task, error) {
 
 // --- Dashboard ---
 
-func dashboardStats(db *sql.DB, month string, maxRecent int) (DashboardStats, error) {
+func dashboardStats(db *sql.DB, month string, maxRecent int, visibility string) (DashboardStats, error) {
 	if maxRecent <= 0 || maxRecent > 50 {
 		maxRecent = 8
 	}
@@ -244,7 +277,17 @@ func dashboardStats(db *sql.DB, month string, maxRecent int) (DashboardStats, er
 		RecentUpdates:        []Task{},
 	}
 
-	rows, err := db.Query(`SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,created_at,updated_at FROM tasks WHERE month=? ORDER BY updated_at ASC`, month)
+	query := `SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,visibility,category,created_at,updated_at FROM tasks WHERE month=?`
+	args := []interface{}{month}
+	if visibility != "" {
+		query += ` AND visibility=?`
+		args = append(args, visibility)
+	} else {
+		query += ` AND visibility!='personal'`
+	}
+	query += ` ORDER BY updated_at ASC`
+
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return s, err
 	}
@@ -329,16 +372,16 @@ func carryOver(db *sql.DB, fromMonth, toMonth string) (int, error) {
 			continue
 		}
 
-		row := db.QueryRow(`SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,created_at,updated_at FROM tasks WHERE id=?`, sid)
+		row := db.QueryRow(`SELECT id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,visibility,category,created_at,updated_at FROM tasks WHERE id=?`, sid)
 		t, err := scanRow(row)
 		if err != nil {
 			continue
 		}
 
 		ts := now()
-		_, err = db.Exec(`INSERT INTO tasks (id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,created_at,updated_at)
-			VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
-			genID(), t.Title, t.Detail, toMonth, t.Status, t.Priority, t.DueDate, fromMonth, sid, t.Tags, ts, ts)
+		_, err = db.Exec(`INSERT INTO tasks (id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,visibility,category,created_at,updated_at)
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+			genID(), t.Title, t.Detail, toMonth, t.Status, t.Priority, t.DueDate, fromMonth, sid, t.Tags, t.Visibility, t.Category, ts, ts)
 		if err == nil {
 			count++
 		}
@@ -368,8 +411,11 @@ func bulkImport(db *sql.DB, items []TaskInput, mode string) (ImportResult, error
 			r.Skipped++
 			continue
 		}
-		// Use tx for consistency
 		ts := now()
+		vis := input.Visibility
+		if vis != "personal" {
+			vis = "work"
+		}
 		t := Task{
 			ID:           genID(),
 			Title:        strings.TrimSpace(input.Title),
@@ -380,6 +426,8 @@ func bulkImport(db *sql.DB, items []TaskInput, mode string) (ImportResult, error
 			DueDate:      input.DueDate,
 			CarryFrom:    input.CarryFrom,
 			SourceTaskID: input.SourceTaskID,
+			Visibility:   vis,
+			Category:     strings.TrimSpace(input.Category),
 			CreatedAt:    ts,
 			UpdatedAt:    ts,
 		}
@@ -393,9 +441,9 @@ func bulkImport(db *sql.DB, items []TaskInput, mode string) (ImportResult, error
 		if len(input.Tags) > 0 {
 			tagsJSON = toJSON(input.Tags)
 		}
-		_, err := tx.Exec(`INSERT INTO tasks (id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,created_at,updated_at)
-			VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
-			t.ID, t.Title, t.Detail, t.Month, t.Status, t.Priority, t.DueDate, t.CarryFrom, t.SourceTaskID, tagsJSON, t.CreatedAt, t.UpdatedAt)
+		_, err := tx.Exec(`INSERT INTO tasks (id,title,detail,month,status,priority,due_date,carry_from,source_task_id,tags,visibility,category,created_at,updated_at)
+			VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+			t.ID, t.Title, t.Detail, t.Month, t.Status, t.Priority, t.DueDate, t.CarryFrom, t.SourceTaskID, tagsJSON, t.Visibility, t.Category, t.CreatedAt, t.UpdatedAt)
 		if err != nil {
 			r.Skipped++
 			continue
@@ -422,6 +470,65 @@ func setPref(db *sql.DB, key, value string) error {
 	return err
 }
 
+// --- Password ---
+
+func isPasswordSet(db *sql.DB) bool {
+	val, err := getPref(db, "personalPassword")
+	return err == nil && val != ""
+}
+
+func verifyPassword(db *sql.DB, password string) bool {
+	hash, err := getPref(db, "personalPassword")
+	if err != nil {
+		return false
+	}
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
+}
+
+func setPassword(db *sql.DB, oldPassword, newPassword string) error {
+	if isPasswordSet(db) {
+		if oldPassword == "" {
+			return fmt.Errorf("old password is required")
+		}
+		if !verifyPassword(db, oldPassword) {
+			return fmt.Errorf("old password is incorrect")
+		}
+	}
+	if len(newPassword) < 4 {
+		return fmt.Errorf("password too short (min 4)")
+	}
+	if len(newPassword) > 100 {
+		return fmt.Errorf("password too long (max 100)")
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+	return setPref(db, "personalPassword", string(hash))
+}
+
+// --- Categories ---
+
+func getCategories(db *sql.DB) ([]CategoryGroup, error) {
+	val, err := getPref(db, "categories")
+	if err != nil {
+		return []CategoryGroup{}, nil
+	}
+	var groups []CategoryGroup
+	if err := json.Unmarshal([]byte(val), &groups); err != nil {
+		return []CategoryGroup{}, nil
+	}
+	return groups, nil
+}
+
+func setCategories(db *sql.DB, groups []CategoryGroup) error {
+	b, err := json.Marshal(groups)
+	if err != nil {
+		return err
+	}
+	return setPref(db, "categories", string(b))
+}
+
 // --- Seed ---
 
 func seedDemo(db *sql.DB) (int, error) {
@@ -434,14 +541,14 @@ func seedDemo(db *sql.DB) (int, error) {
 	}
 
 	demo := []TaskInput{
-		{Title: "Q2 绩效复盘", Detail: "收集团队指标，准备全员会议幻灯片。跟进各部门负责人获取输入。", Month: "2026-06", Status: "doing", Priority: "high", DueDate: strptr("2026-06-15"), Tags: []string{"管理", "报告"}},
-		{Title: "更新新人入职文档", Detail: "补充新工具使用指南和常见问题解答。", Month: "2026-06", Status: "todo", Priority: "low", DueDate: strptr("2026-06-20"), Tags: []string{"文档", "新人"}},
-		{Title: "修复 API 限流 Bug", Detail: "高并发场景下限流器未正确释放连接。", Month: "2026-06", Status: "done", Priority: "high", DueDate: strptr("2026-06-05"), Tags: []string{"后端", "Bug"}},
-		{Title: "部署 v2.1 版本", Detail: "包含性能优化和安全补丁的例行发布。", Month: "2026-06", Status: "done", Priority: "medium", Tags: []string{"运维", "发布"}},
-		{Title: "安排一对一沟通", Detail: "与团队成员进行月度一对一反馈。", Month: "2026-06", Status: "todo", Priority: "medium", DueDate: strptr("2026-06-10"), Tags: []string{"管理"}},
-		{Title: "数据库迁移方案评估", Detail: "评估从 MySQL 8.0 迁移到 8.4 的兼容性和风险。", Month: "2026-06", Status: "paused", Priority: "low", Tags: []string{"后端", "数据库"}},
-		{Title: "优化构建流水线速度", Detail: "当前 CI 耗时 12 分钟，目标优化到 5 分钟内。", Month: "2026-06", Status: "doing", Priority: "medium", DueDate: strptr("2026-06-18"), Tags: []string{"工具", "CI/CD"}},
-		{Title: "编写技术分享材料", Detail: "下周五团队分享会主题：Go 并发模式最佳实践。", Month: "2026-06", Status: "todo", Priority: "medium", DueDate: strptr("2026-06-12"), Tags: []string{"文档", "分享"}},
+		{Title: "Q2 绩效复盘", Detail: "收集团队指标，准备全员会议幻灯片。跟进各部门负责人获取输入。", Month: "2026-06", Status: "doing", Priority: "high", DueDate: strptr("2026-06-15"), Tags: []string{"管理", "报告"}, Visibility: "work", Category: "绩效"},
+		{Title: "更新新人入职文档", Detail: "补充新工具使用指南和常见问题解答。", Month: "2026-06", Status: "todo", Priority: "low", DueDate: strptr("2026-06-20"), Tags: []string{"文档", "新人"}, Visibility: "work", Category: "技术方案"},
+		{Title: "修复 API 限流 Bug", Detail: "高并发场景下限流器未正确释放连接。", Month: "2026-06", Status: "done", Priority: "high", DueDate: strptr("2026-06-05"), Tags: []string{"后端", "Bug"}, Visibility: "work", Category: "后端"},
+		{Title: "部署 v2.1 版本", Detail: "包含性能优化和安全补丁的例行发布。", Month: "2026-06", Status: "done", Priority: "medium", Tags: []string{"运维", "发布"}, Visibility: "work", Category: "部署上线"},
+		{Title: "安排一对一沟通", Detail: "与团队成员进行月度一对一反馈。", Month: "2026-06", Status: "todo", Priority: "medium", DueDate: strptr("2026-06-10"), Tags: []string{"管理"}, Visibility: "personal", Category: "沟通"},
+		{Title: "数据库迁移方案评估", Detail: "评估从 MySQL 8.0 迁移到 8.4 的兼容性和风险。", Month: "2026-06", Status: "paused", Priority: "low", Tags: []string{"后端", "数据库"}, Visibility: "work", Category: "后端"},
+		{Title: "优化构建流水线速度", Detail: "当前 CI 耗时 12 分钟，目标优化到 5 分钟内。", Month: "2026-06", Status: "doing", Priority: "medium", DueDate: strptr("2026-06-18"), Tags: []string{"工具", "CI/CD"}, Visibility: "work", Category: "前端"},
+		{Title: "编写技术分享材料", Detail: "下周五团队分享会主题：Go 并发模式最佳实践。", Month: "2026-06", Status: "todo", Priority: "medium", DueDate: strptr("2026-06-12"), Tags: []string{"文档", "分享"}, Visibility: "personal", Category: "周报"},
 	}
 
 	inserted := 0

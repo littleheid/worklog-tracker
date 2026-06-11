@@ -187,6 +187,67 @@
     "deleteRefreshFailed": "Refresh after delete failed"
   },
   "language": "Language",
+  "visibility": {
+    "work": "Work",
+    "personal": "Personal",
+    "label": "Visibility",
+    "select": "Select visibility"
+  },
+  "category": {
+    "label": "Category",
+    "select": "Select category",
+    "uncategorized": "Uncategorized",
+    "none": "No sub-categories",
+    "noCategories": "No categories set. Go to Settings → Category Management to add.",
+    "managementTitle": "Category Management",
+    "managementDesc": "Organize categories by group. Select from dropdown when creating/editing tasks.",
+    "addGroupPlaceholder": "New group name (optional)",
+    "addItemPlaceholder": "Add item under {group}",
+    "addGroup": "Add Group",
+    "add": "Add",
+    "save": "Save",
+    "cancel": "Cancel",
+    "groupExists": "Group already exists",
+    "itemExists": "Item already exists"
+  },
+  "password": {
+    "title": "Privacy Password",
+    "setDesc": "Set a password to protect personal items.",
+    "hasPassword": "Password is set. Click to change.",
+    "setButton": "Set Password",
+    "changeButton": "Change Password",
+    "oldPassword": "Old Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "oldPlaceholder": "Enter current password",
+    "newPlaceholder": "Enter new password (min 4 chars)",
+    "confirmPlaceholder": "Re-enter new password",
+    "minLength": "Password must be at least 4 characters",
+    "mismatch": "Passwords do not match",
+    "saved": "Password updated",
+    "oldRequired": "Old password is required",
+    "error": "Operation failed",
+    "saving": "Saving..."
+  },
+  "lock": {
+    "lock": "Lock private items",
+    "unlock": "Unlock private items"
+  },
+  "passwordModal": {
+    "unlockTitle": "Unlock Private Items",
+    "setTitle": "Set Privacy Password",
+    "noPassword": "No password set?",
+    "setLink": "Set one",
+    "hasPassword": "Already have a password?",
+    "unlockLink": "Unlock",
+    "passwordLabel": "Password",
+    "confirmLabel": "Confirm Password",
+    "submitUnlock": "Unlock",
+    "submitSet": "Set",
+    "wrongPassword": "Incorrect password",
+    "fillPassword": "Please enter password",
+    "mismatch": "Passwords do not match"
+  },
   "settings": {
     "title": "Settings",
     "desc": "Adjust display preferences and behavior. Changes take effect immediately.",

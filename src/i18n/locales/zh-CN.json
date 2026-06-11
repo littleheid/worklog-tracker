@@ -187,6 +187,67 @@
     "deleteRefreshFailed": "删除后刷新失败"
   },
   "language": "语言",
+  "visibility": {
+    "work": "工作",
+    "personal": "私人",
+    "label": "可见性",
+    "select": "选择可见性"
+  },
+  "category": {
+    "label": "分类",
+    "select": "选择分类",
+    "uncategorized": "未分类",
+    "none": "暂无子分类",
+    "noCategories": "尚未设置分类，请前往设置 → 分类管理添加。",
+    "managementTitle": "分类管理",
+    "managementDesc": "按分组组织分类，新建/编辑任务时从下拉选择",
+    "addGroupPlaceholder": "新分组名（可选填）",
+    "addItemPlaceholder": "添加 {group} 下的分类",
+    "addGroup": "添加分组",
+    "add": "添加",
+    "save": "保存",
+    "cancel": "取消",
+    "groupExists": "分组名已存在",
+    "itemExists": "分类名已存在"
+  },
+  "password": {
+    "title": "隐私密码",
+    "setDesc": "设定密码后，私人事项将被保护",
+    "hasPassword": "已设定密码，点击修改密码",
+    "setButton": "设置密码",
+    "changeButton": "修改密码",
+    "oldPassword": "旧密码",
+    "newPassword": "新密码",
+    "confirmPassword": "确认新密码",
+    "oldPlaceholder": "输入当前密码",
+    "newPlaceholder": "输入新密码（至少4位）",
+    "confirmPlaceholder": "再次输入新密码",
+    "minLength": "密码至少4位",
+    "mismatch": "两次密码不一致",
+    "saved": "密码已更新",
+    "oldRequired": "请输入旧密码",
+    "error": "操作失败",
+    "saving": "保存中..."
+  },
+  "lock": {
+    "lock": "锁定私人事项",
+    "unlock": "解锁私人事项"
+  },
+  "passwordModal": {
+    "unlockTitle": "解锁私人事项",
+    "setTitle": "设置隐私密码",
+    "noPassword": "尚未设定密码？",
+    "setLink": "点击设置",
+    "hasPassword": "已有密码？",
+    "unlockLink": "点击解锁",
+    "passwordLabel": "密码",
+    "confirmLabel": "确认密码",
+    "submitUnlock": "解锁",
+    "submitSet": "设定",
+    "wrongPassword": "密码错误",
+    "fillPassword": "请输入密码",
+    "mismatch": "两次密码不一致"
+  },
   "settings": {
     "title": "个性化设置",
     "desc": "调整显示偏好和行为选项，所有更改即时生效。",

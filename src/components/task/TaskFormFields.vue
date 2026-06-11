@@ -1,15 +1,52 @@
 <script setup lang="ts">
+import { computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useTaskOptions } from "../../composables/useTaskOptions";
-import type { TaskDraft, TaskPriority, TaskStatus } from "../../types/task";
+import { useUiStore } from "../../stores/uiStore";
+import type { TaskDraft, TaskPriority, TaskStatus, TaskVisibility } from "../../types/task";
 import DateValuePicker from "../common/DateValuePicker.vue";
-import MenuSelect from "../common/MenuSelect.vue";
+import MenuSelect, { type OptionItem } from "../common/MenuSelect.vue";
 import TagInput from "../common/TagInput.vue";
 
 const form = defineModel<TaskDraft>({ required: true });
 defineProps<{ error?: boolean }>();
 const { t } = useI18n();
+const uiStore = useUiStore();
 const { taskStatusOptions, taskPriorityOptions } = useTaskOptions();
+
+const visibilityOptions = [
+  { label: t("visibility.work"), value: "work" },
+  { label: t("visibility.personal"), value: "personal" }
+];
+
+const hasCategories = computed(() => uiStore.categoryOptions.length > 0);
+
+// 扁平化：按组渲染带视觉层次的选项列表
+// 分组标题用 disabled 禁止选中，子项缩进排列
+const flatCategoryOptions = computed<OptionItem[]>(() => {
+  const result: OptionItem[] = [{ label: t("category.uncategorized"), value: "" }];
+  for (const group of uiStore.categoryOptions) {
+    if (group.items.length === 0) continue;
+    result.push({ label: `━━ ${group.group} ━━`, value: `__group__${group.group}`, disabled: true });
+    for (const item of group.items) {
+      result.push({ label: `　${item}`, value: item });
+    }
+  }
+  return result;
+});
+
+function goToSettings() {
+  uiStore.setActivePage("settings");
+}
+
+// 私人模式下自动设 visibility 为 personal；工作模式默认为 work
+watch(() => uiStore.visibilityMode, (mode) => {
+  if (mode === "personal") {
+    form.value.visibility = "personal";
+  } else if (mode === "work" && form.value.visibility === "personal") {
+    form.value.visibility = "work";
+  }
+});
 </script>
 
 <template>
@@ -55,6 +92,29 @@ const { taskStatusOptions, taskPriorityOptions } = useTaskOptions();
     <label class="md:col-span-2">
       <span class="mb-1.5 block text-[13px] font-semibold text-stone-700">标签</span>
       <TagInput :model-value="form.tags ?? []" @update:model-value="form.tags = $event" />
+    </label>
+
+    <!-- 可见性 -->
+    <label>
+      <span class="mb-1.5 block text-[13px] font-semibold text-stone-700">{{ t("visibility.label") }}</span>
+      <MenuSelect :model-value="form.visibility ?? 'work'" :options="visibilityOptions" full-width
+        @update:model-value="form.visibility = ($event as TaskVisibility)" />
+    </label>
+
+    <!-- 分类 -->
+    <label class="md:col-span-2">
+      <span class="mb-1.5 block text-[13px] font-semibold text-stone-700">{{ t("category.label") }}</span>
+      <div v-if="!hasCategories" class="rounded-xl bg-amber-50/60 border border-amber-200 px-4 py-3 text-[13px] text-amber-700">
+        {{ t("category.noCategories") }}
+      </div>
+      <div v-else>
+        <MenuSelect
+          :model-value="form.category ?? ''"
+          :options="flatCategoryOptions"
+          full-width
+          :placeholder="t('category.select')"
+          @update:model-value="form.category = ($event as string)" />
+      </div>
     </label>
 
     <!-- 截止日期 -->

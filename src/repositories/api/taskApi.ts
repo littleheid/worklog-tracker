@@ -1,4 +1,5 @@
 import type {
+  CategoryGroup,
   DashboardStats,
   Task,
   TaskDraft,
@@ -28,6 +29,8 @@ function buildQuery(q: TaskQuery | TaskPagedQuery): string {
   if (q.priority && q.priority !== "all") params.set("priority", q.priority);
   if (q.keyword) params.set("keyword", q.keyword);
   if (q.sortBy) params.set("sortBy", q.sortBy);
+  if (q.visibility) params.set("visibility", q.visibility);
+  if (q.category) params.set("category", q.category);
   if ("page" in q && q.page) params.set("page", String(q.page));
   if ("pageSize" in q && q.pageSize) params.set("pageSize", String(q.pageSize));
   const s = params.toString();
@@ -55,16 +58,17 @@ export const taskApi = {
     await request(`${BASE}/tasks/${id}`, { method: "DELETE" });
   },
 
-  async getAll(): Promise<Task[]> {
-    return request(`${BASE}/tasks/export`);
+  async getAll(visibility = ""): Promise<Task[]> {
+    const qs = visibility ? `?visibility=${encodeURIComponent(visibility)}` : "";
+    return request(`${BASE}/tasks/export${qs}`);
   },
 
-  async dashboardStats(month: string, recentLimit = 10): Promise<DashboardStats> {
-    return request(`${BASE}/dashboard?month=${encodeURIComponent(month)}&limit=${recentLimit}`);
+  async dashboardStats(month: string, recentLimit = 10, visibility = ""): Promise<DashboardStats> {
+    return request(`${BASE}/dashboard?month=${encodeURIComponent(month)}&limit=${recentLimit}${visibility ? "&visibility=" + encodeURIComponent(visibility) : ""}`);
   },
 
-  async monthlyStats(_month: string): Promise<{ total: number; done: number; undone: number }> {
-    const stats = await this.dashboardStats(_month);
+  async monthlyStats(_month: string, visibility = ""): Promise<{ total: number; done: number; undone: number }> {
+    const stats = await this.dashboardStats(_month, 8, visibility);
     return { total: stats.total, done: stats.done, undone: stats.total - stats.done };
   },
 
@@ -107,6 +111,39 @@ export const prefsApi = {
     await request(`${BASE}/prefs/${key}`, {
       method: "PUT",
       body: JSON.stringify({ value: JSON.stringify(value) })
+    });
+  }
+};
+
+export const authApi = {
+  async status(): Promise<{ isSet: boolean }> {
+    return request(`${BASE}/auth/status`);
+  },
+
+  async verifyPassword(password: string): Promise<{ ok: boolean }> {
+    return request(`${BASE}/auth/verify-password`, {
+      method: "POST",
+      body: JSON.stringify({ password })
+    });
+  },
+
+  async setPassword(oldPassword: string, newPassword: string): Promise<{ ok: string }> {
+    return request(`${BASE}/auth/set-password`, {
+      method: "PUT",
+      body: JSON.stringify({ oldPassword, newPassword })
+    });
+  }
+};
+
+export const categoryApi = {
+  async getAll(): Promise<CategoryGroup[]> {
+    return request(`${BASE}/categories`);
+  },
+
+  async save(categories: CategoryGroup[]): Promise<{ ok: string }> {
+    return request(`${BASE}/categories`, {
+      method: "PUT",
+      body: JSON.stringify(categories)
     });
   }
 };

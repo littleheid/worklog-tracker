@@ -3,5 +3,9 @@ import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  plugins: [vue(), tailwindcss()]
+  plugins: [vue(), tailwindcss()],
+  build: {
+    outDir: "server/dist",
+    emptyOutDir: true
+  }
 });
